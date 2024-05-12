@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Streamer</title>
+</head>
+<body>
+    <h1>Music Playlist</h1>
+    <div id="songsContainer"></div>
+
+    <script>
+       async function playSong(songPath) {
+    await fetch('/play_song', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ song_path: songPath })
+    });
+    window.location.href = '/recommendations_page';  // Redirect to the recommendations page
+}
+
+
+        async function fetchSongs() {
+            const response = await fetch('/songs');
+            const songs = await response.json();
+            const container = document.getElementById('songsContainer');
+            songs.forEach(songPath => {
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                audio.src = `/audio/${encodeURIComponent(songPath)}`;
+                audio.onplay = () => playSong(songPath); // Redirect when a song is played
+                container.appendChild(audio);
+            });
+        }
+
+        window.onload = fetchSongs;
+    </script>
+</body>
+</html>
+

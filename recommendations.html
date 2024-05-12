@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song Recommendations</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        audio { display: block; margin-top: 10px; margin-bottom: 20px; }
+        .container { margin-top: 20px; }
+        h2 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Recommendations</h1>
+    <div id="lastPlayedContainer" class="container">
+        <h2>Last Played Song</h2>
+    </div>
+    <div id="recommendationsContainer" class="container">
+        <h2>Recommendations</h2>
+    </div>
+
+  <script>
+    async function fetchRecommendations() {
+        const response = await fetch('/recommendations');
+        const data = await response.json();
+        console.log('Received data:', data);  // Log data to see what is received
+
+        const lastPlayedContainer = document.getElementById('lastPlayedContainer');
+        const recommendationsContainer = document.getElementById('recommendationsContainer');
+
+        if (data.last_played && data.recommendations) {
+            const lastPlayedAudio = document.createElement('audio');
+            lastPlayedAudio.controls = true;
+            lastPlayedAudio.src = `/audio/${encodeURIComponent(data.last_played)}`;
+            lastPlayedContainer.appendChild(lastPlayedAudio);
+
+            data.recommendations.forEach(rec => {
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                audio.src = `/audio/${encodeURIComponent(rec)}`;
+                recommendationsContainer.appendChild(audio);
+            });
+        } else {
+            console.error('Invalid data received:', data);
+            lastPlayedContainer.textContent = 'No last played song data available.';
+            recommendationsContainer.textContent = 'No recommendations available.';
+        }
+    }
+
+    window.onload = fetchRecommendations;
+</script>
+
+</body>
+</html>
+
